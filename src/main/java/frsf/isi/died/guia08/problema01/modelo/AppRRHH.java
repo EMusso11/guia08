@@ -1,12 +1,12 @@
-package frsf.isi.died.guia08.problema01;
+package frsf.isi.died.guia08.problema01.modelo;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import frsf.isi.died.guia08.problema01.modelo.Empleado;
-import frsf.isi.died.guia08.problema01.modelo.Tarea;
+import frsf.isi.died.guia08.problema01.exceptions.tareaNoEncontradaException;
 
 public class AppRRHH {
 
@@ -15,28 +15,63 @@ public class AppRRHH {
 	public void agregarEmpleadoContratado(Integer cuil,String nombre,Double costoHora) {
 		// crear un empleado
 		// agregarlo a la lista
+		Empleado e1 = new Empleado(cuil, nombre, costoHora, frsf.isi.died.guia08.problema01.modelo.Empleado.Tipo.CONTRATADO);
+		empleados.add(e1);
 	}
 	
 	public void agregarEmpleadoEfectivo(Integer cuil,String nombre,Double costoHora) {
 		// crear un empleado
-		// agregarlo a la lista		
+		// agregarlo a la lista
+		Empleado e1 = new Empleado(cuil, nombre, costoHora, frsf.isi.died.guia08.problema01.modelo.Empleado.Tipo.EFECTIVO);
+		empleados.add(e1);
 	}
 	
 	public void asignarTarea(Integer cuil,Integer idTarea,String descripcion,Integer duracionEstimada) {
 		// crear un empleado
 		// con el método buscarEmpleado() de esta clase
-		// agregarlo a la lista		
+		// agregarlo a la lista	
+		Empleado e1;
+		Tarea t1;
+		try {
+			e1 = buscarEmpleado( e -> e.getCuil().equals(cuil) ).get();
+			t1 = new Tarea(idTarea, descripcion, duracionEstimada);
+			e1.asignarTarea(t1);
+		} catch (NoSuchElementException e) {
+			e.getMessage();
+		}
+		
+		
 	}
 	
 	public void empezarTarea(Integer cuil,Integer idTarea) {
 		// busca el empleado por cuil en la lista de empleados
 		// con el método buscarEmpleado() actual de esta clase
 		// e invoca al método comenzar tarea
+		Empleado e1;
+		Tarea t1;
+		try {
+			e1 = buscarEmpleado( e -> e.getCuil().equals(cuil) ).get();
+			e1.comenzar(idTarea);
+		} catch (NoSuchElementException e) {
+			e.getMessage();
+		} catch (tareaNoEncontradaException e) {
+			e.getMessage();
+		}
 	}
 	
 	public void terminarTarea(Integer cuil,Integer idTarea) {
 		// crear un empleado
-		// agregarlo a la lista		
+		// agregarlo a la lista	
+		Empleado e1;
+		Tarea t1;
+		try {
+			e1 = buscarEmpleado( e -> e.getCuil().equals(cuil) ).get();
+			e1.finalizar(idTarea);
+		} catch (NoSuchElementException e) {
+			e.getMessage();
+		} catch (tareaNoEncontradaException e) {
+			e.getMessage();
+		}
 	}
 
 	public void cargarEmpleadosContratadosCSV(String nombreArchivo) {

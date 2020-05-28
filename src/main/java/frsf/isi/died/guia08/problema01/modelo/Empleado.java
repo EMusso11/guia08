@@ -1,13 +1,15 @@
 package frsf.isi.died.guia08.problema01.modelo;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.function.*;
+
+import frsf.isi.died.guia08.problema01.exceptions.*;
 
 public class Empleado {
 
-	public enum Tipo { CONTRATADO,EFECTIVO}; 
+	public enum Tipo {CONTRATADO, EFECTIVO}; 
 	
 	private Integer cuil;
 	private String nombre;
@@ -15,15 +17,54 @@ public class Empleado {
 	private Double costoHora;
 	private List<Tarea> tareasAsignadas;
 	
-	private Function<Tarea, Double> calculoPagoPorTarea;		
+	private Function<Tarea, Double> calculoPagoPorTarea;
 	private Predicate<Tarea> puedeAsignarTarea;
-
 	
+	public Empleado(Tipo tipo, Double costoHora) {
+		this.tipo = tipo;
+		this.costoHora = costoHora;
+	}
+	
+	public Empleado(Tipo tipo, List<Tarea> tareasAsignadas, Double costoHora) {
+		this.tipo = tipo;
+		this.tareasAsignadas = tareasAsignadas;
+		this.costoHora = costoHora;
+	}
+	
+	public Empleado(Integer cuil, String nombre, Double costoHora, Tipo tipo) {
+		this.cuil = cuil;
+		this.nombre = nombre;
+		this.costoHora = costoHora;
+		this.tipo = tipo;
+	}
+	
+	public Empleado(Integer cuil) {
+		this.cuil = cuil;
+	}
+	
+
+	public Integer getCuil() {
+		return cuil;
+	}
+
+	public void setCuil(Integer cuil) {
+		this.cuil = cuil;
+	}
+
 	public Double salario() {
 		// cargar todas las tareas no facturadas
 		// calcular el costo
 		// marcarlas como facturadas.
-		return 0.0;
+		Double cost;
+		cost = tareasAsignadas.stream()
+							.filter( t -> !t.getFacturada())
+							.map( t -> this.costoTarea(t) )
+							.reduce(0.0, (c1, c2) -> c1+c2);
+		tareasAsignadas.stream()
+						.filter( t -> !t.getFacturada())
+						.forEach( t -> t.setFacturada(true));
+		
+		return cost;
 	}
 	
 	/**
@@ -33,34 +74,106 @@ public class Empleado {
 	 * @return
 	 */
 	public Double costoTarea(Tarea t) {
-		return 0.0;
+		Double cost=0.0;
+		Duration duracion = Duration.between(t.getFechaInicio(), t.getFechaFin());
+		calculoPagoPorTarea = (t1) -> 0.0;
+		if(t.getFechaFin()!=null) {	//terminada
+			
+			if((duracion.toDays()*4) < t.getDuracionEstimada()) {
+				switch(this.tipo) {
+				case EFECTIVO:
+					this.costoHora*=1.2;
+					break;
+				case CONTRATADO:
+					if(duracion.toDays() >= 2) {
+						this.costoHora*=0.75;
+					} else {
+						this.costoHora*=1.3;
+					}
+					break;
+				}
+			}
+			cost += calculoPagoPorTarea.apply(t);
+			
+		}else {						//no terminada
+			cost += this.costoHora*t.getDuracionEstimada();
+		}
+		
+		return cost;
 	}
 		
 	public Boolean asignarTarea(Tarea t) {
-		return false;
+//		Predicate<Tarea> terminada = (tar -> tar.getFechaFin()!=null);
+		switch(this.tipo) {
+		case CONTRATADO:
+			long cant = this.tareasAsignadas.stream()
+										.filter(tar -> tar.getFechaFin()!=null)
+										.count();
+			if(cant>=5) return false;
+		case EFECTIVO:
+			Integer cant_pendientes = this.tareasAsignadas.stream()
+												.filter(tar -> tar.getFechaFin()!=null)
+												.mapToInt(Tarea::getDuracionEstimada)
+												.reduce(0, (dur1, dur2) -> dur1 + dur2);
+			if(cant_pendientes+t.getDuracionEstimada()<15)return false;
+		}
+		
+		try {
+			tareasAsignadas.add(t);
+			t.asignarEmpleado(this);
+		} catch(AsignarTareaEmpAsignadoException e) {
+			System.out.println(e.getMessage());
+		} catch (AsignarTareaFechaFinException e) {
+			System.out.println(e.getMessage());
+		}
+
+		return true;
+
 	}
 	
-	public void comenzar(Integer idTarea) {
-		// busca la tarea en la lista de tareas asignadas 
-		// si la tarea no existe lanza una excepción
-		// si la tarea existe indica como fecha de inicio la fecha y hora actual
+	public void comenzar(Integer idTarea) throws tareaNoEncontradaException {
+		Optional<Tarea> tareaOpt = 	this.tareasAsignadas.stream()
+														.filter( tar -> idTarea.equals(tar.getId()) )
+														.findFirst();
+		if(tareaOpt.isPresent()) {
+			tareaOpt.get().setFechaInicio(LocalDateTime.now());
+		} else {
+			throw new tareaNoEncontradaException("La tarea no existe en la lista.");
+		}
 	}
 	
-	public void finalizar(Integer idTarea) {
-		// busca la tarea en la lista de tareas asignadas 
-		// si la tarea no existe lanza una excepción
-		// si la tarea existe indica como fecha de finalizacion la fecha y hora actual
+	public void finalizar(Integer idTarea) throws tareaNoEncontradaException {
+		Optional<Tarea> tareaOpt = 	this.tareasAsignadas.stream()
+				.filter( tar -> idTarea.equals(tar.getId()) )
+				.findFirst();
+		if(tareaOpt.isPresent()) {
+			tareaOpt.get().setFechaFin(LocalDateTime.now());
+		} else {
+			throw new tareaNoEncontradaException("La tarea no existe en la lista.");
+		}
 	}
 
-	public void comenzar(Integer idTarea,String fecha) {
-		// busca la tarea en la lista de tareas asignadas 
-		// si la tarea no existe lanza una excepción
-		// si la tarea existe indica como fecha de finalizacion la fecha y hora actual
+	public void comenzar(Integer idTarea,String fecha) throws tareaNoEncontradaException {
+		DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+		Optional<Tarea> tareaOpt = 	this.tareasAsignadas.stream()
+				.filter( tar -> idTarea.equals(tar.getId()) )
+				.findFirst();
+		if(tareaOpt.isPresent()) {
+			tareaOpt.get().setFechaInicio(LocalDateTime.parse(fecha, format));
+		} else {
+			throw new tareaNoEncontradaException("La tarea no existe en la lista.");
+		}
 	}
 	
-	public void finalizar(Integer idTarea,String fecha) {
-		// busca la tarea en la lista de tareas asignadas 
-		// si la tarea no existe lanza una excepción
-		// si la tarea existe indica como fecha de finalizacion la fecha y hora actual
+	public void finalizar(Integer idTarea,String fecha) throws tareaNoEncontradaException {
+		DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+		Optional<Tarea> tareaOpt = 	this.tareasAsignadas.stream()
+				.filter( tar -> idTarea.equals(tar.getId()) )
+				.findFirst();
+		if(tareaOpt.isPresent()) {
+			tareaOpt.get().setFechaFin(LocalDateTime.parse(fecha, format));
+		} else {
+			throw new tareaNoEncontradaException("La tarea no existe en la lista.");
+		}
 	}
 }

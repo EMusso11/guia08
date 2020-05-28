@@ -7,7 +7,9 @@ import frsf.isi.died.guia08.problema02.modelo.Fecha;
 
 public class LigaApp {
 
-	private List<Fecha> calendario;
-	private List<Equipo> equipos;
-	
+//	private List<Fecha> calendario;
+//	private List<Equipo> equipos;
+	public static void main(String[] args) {
+		
+	}
 }
