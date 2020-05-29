@@ -3,15 +3,20 @@ package frsf.isi.died.guia08.problema01.modelo;
 import static org.junit.Assert.*;
 
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import frsf.isi.died.guia08.problema01.exceptions.AsignarTareaEmpAsignadoException;
+import frsf.isi.died.guia08.problema01.exceptions.AsignarTareaFechaFinException;
+import frsf.isi.died.guia08.problema01.exceptions.tareaNoEncontradaException;
+
 public class EmpleadoTest {
 
-	Tarea t1, t2, t3, t4, t5, t6;
+	Tarea t1, t2, t3, t4, t5, t6, t7;
 	Empleado e1, e2, e3;
 	List<Tarea> tareas;
 	
@@ -23,6 +28,7 @@ public class EmpleadoTest {
 		t4 = new Tarea(LocalDateTime.parse("2020-01-01T00:00:00.000"), LocalDateTime.parse("2020-01-02T00:00:00.000"), 100);
 		t5 = new Tarea(LocalDateTime.parse("2020-01-01T00:00:00.000"), LocalDateTime.parse("2020-01-05T00:00:00.000"), 20);
 		t6 = new Tarea(LocalDateTime.parse("2020-01-01T00:00:00.000"), LocalDateTime.parse("2020-01-05T00:00:00.000"), 20);
+		t7 = new Tarea(1234, null, null);
 		e1 = new Empleado(frsf.isi.died.guia08.problema01.modelo.Empleado.Tipo.CONTRATADO, 50.0);
 		tareas = new ArrayList<Tarea>();
 		
@@ -32,6 +38,7 @@ public class EmpleadoTest {
 		tareas.add(t3);
 		tareas.add(t4);
 		tareas.add(t5);
+		tareas.add(t7);
 		e3 = new Empleado(frsf.isi.died.guia08.problema01.modelo.Empleado.Tipo.CONTRATADO, tareas, 50.0);
 	}
 	
@@ -62,8 +69,6 @@ public class EmpleadoTest {
 		Double cost3 = e2.costoTarea(t4);
 		assertSame(cost3, 65.0);
 	}
-	
-//	Falta CALCULOPAGOPORTAREA
 
 	@Test
 	public void testAsignarTarea() {
@@ -71,20 +76,35 @@ public class EmpleadoTest {
 		
 		assertFalse(e3.asignarTarea(t6));
 	}
-
-	@Test
-	public void testComenzarInteger() {
-		fail("Not yet implemented");
+	
+	@Test(expected = AsignarTareaEmpAsignadoException.class)
+	public void testAsignarTareaEmpAsignadoException() {
+		e1.asignarTarea(t1);
+	}
+	
+	@Test(expected = AsignarTareaFechaFinException.class)
+	public void testAsignarTareaFechaFinException() {
+		e1.asignarTarea(t2);
 	}
 
 	@Test
-	public void testFinalizarInteger() {
-		fail("Not yet implemented");
+	public void testComenzarInteger() throws tareaNoEncontradaException {
+		e3.comenzar(t7.getId());
+		assertSame(t7.getFechaInicio(), LocalDateTime.now());
+	}
+
+	@Test
+	public void testFinalizarInteger() throws tareaNoEncontradaException {
+		e3.finalizar(t7.getId());
+		assertSame(t7.getFechaFin(), LocalDateTime.now());
 	}
 
 	@Test
 	public void testComenzarIntegerString() {
-		fail("Not yet implemented");
+		e3.comenzar(t7.getId(), "01-01-2020 12:00");
+		DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+		
+		assertSame(t7.getFechaFin(), LocalDateTime.now().parse(, format));
 	}
 
 	@Test

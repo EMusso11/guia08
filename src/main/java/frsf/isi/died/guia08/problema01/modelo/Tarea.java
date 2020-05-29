@@ -31,8 +31,6 @@ public class Tarea {
 	}
 
 	public void asignarEmpleado(Empleado e) throws AsignarTareaEmpAsignadoException, AsignarTareaFechaFinException {
-		// si la tarea ya tiene un empleado asignado
-		// y tiene fecha de finalizado debe lanzar una excepcion
 		if(empleadoAsignado!=null) throw new AsignarTareaEmpAsignadoException("La tarea que se quiere asignar es incorrecta. Seleccione otra tarea.");
 		if(fechaFin!=null) throw new AsignarTareaFechaFinException("La tarea que se quiere asignar ha finalizado.");
 		this.empleadoAsignado = e;
