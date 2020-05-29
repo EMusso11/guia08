@@ -3,6 +3,7 @@ package frsf.isi.died.guia08.problema01.modelo;
 import java.io.*;
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 import frsf.isi.died.guia08.problema01.exceptions.TareaNoEncontradaException;
 
@@ -77,8 +78,6 @@ public class AppRRHH {
 	}
 
 	public void cargarEmpleadosEfectivosCSV(String nombreArchivo) {
-		// leer datos del archivo
-		// por cada fila invocar a agregarEmpleadoContratado
 		try(Reader fr = new FileReader(nombreArchivo+".csv")){
 			//cuil;/nombre;/costoHora
 			try(BufferedReader rd = new BufferedReader(fr)){
@@ -98,9 +97,6 @@ public class AppRRHH {
 	}
 
 	public void cargarTareasCSV(String nombreArchivo) {
-		// leer datos del archivo
-		// cada fila del archivo tendrá:
-		// cuil del empleado asignado, numero de la taera, descripcion y duración estimada en horas.
 		try(Reader fr = new FileReader(nombreArchivo+".csv")){
 			try(BufferedReader rd = new BufferedReader(fr)){
 				String linea = null;
@@ -110,7 +106,7 @@ public class AppRRHH {
 					String descripcion = fila[1];
 					Integer duracionEstimada = Integer.valueOf(fila[2]);
 					Integer cuil = Integer.valueOf(fila[3]);
-					Tarea t1 = new Tarea(idTarea, descripcion, duracionEstimada);s
+					Tarea t1 = new Tarea(idTarea, descripcion, duracionEstimada);
 					this.empezarTarea(cuil, idTarea);
 				}
 			}
@@ -119,18 +115,29 @@ public class AppRRHH {
 		}
 	}
 	
-	private void guardarTareasTerminadasCSV() {
-		// guarda una lista con los datos de la tarea que fueron terminadas
-		// y todavía no fueron facturadas
-		// y el nombre y cuil del empleado que la finalizó en formato CSV 
-		
+	private void guardarTareasTerminadasCSV() throws IOException {
+		List<Tarea> tareas = new ArrayList<Tarea>();
+		this.empleados.stream()
+						.map( e1 -> e1.getTareasAsignadas() )
+						.forEach( t1 -> tareas.addAll(t1));
+		tareas.stream()
+				.filter( t1 -> !t1.getFacturada() )
+				.collect(Collectors.toList());
+		try(Writer fw = new FileWriter("tareasTerminadas.csv")){
+			try(BufferedWriter wr = new BufferedWriter(fw)){
+				for(Tarea t : tareas)
+					wr.write(t.asCsv(t.getEmpleadoAsignado().getCuil(), t.getEmpleadoAsignado().getNombre())+System.getProperty("line.separator"));
+			}
+		} catch(IOException e) {
+			e.getMessage();
+		}
 	}
 	
 	private Optional<Empleado> buscarEmpleado(Predicate<Empleado> p){
 		return this.empleados.stream().filter(p).findFirst();
 	}
 
-	public Double facturar() {
+	public Double facturar() throws IOException {
 		this.guardarTareasTerminadasCSV();
 		return this.empleados.stream()				
 				.mapToDouble(e -> e.salario())

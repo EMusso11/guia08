@@ -87,6 +87,10 @@ public class Tarea {
 	public Empleado getEmpleadoAsignado() {
 		return empleadoAsignado;
 	}
+
+	public String asCsv(Integer cuil, String nombre) {
+		return this.id+";\""+this.descripcion+";\""+cuil+";\""+nombre;
+	}
 	
 	
 }

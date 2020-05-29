@@ -68,6 +68,14 @@ public class Empleado {
 		this.cuil = cuil;
 	}
 
+	public List<Tarea> getTareasAsignadas() {
+		return tareasAsignadas;
+	}
+
+	public void setTareasAsignadas(List<Tarea> tareasAsignadas) {
+		this.tareasAsignadas = tareasAsignadas;
+	}
+
 	public Double salario() {
 		Double cost;
 		cost = tareasAsignadas.stream()
