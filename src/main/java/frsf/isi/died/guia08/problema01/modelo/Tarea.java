@@ -76,6 +76,10 @@ public class Tarea {
 		this.fechaFin = fechaFin;
 	}
 
+	public void setEmpleadoAsignado(Empleado empleadoAsignado) {
+		this.empleadoAsignado = empleadoAsignado;
+	}
+
 	public Boolean getFacturada() {
 		return facturada;
 	}
@@ -91,6 +95,5 @@ public class Tarea {
 	public String asCsv(Integer cuil, String nombre) {
 		return this.id+";\""+this.descripcion+";\""+cuil+";\""+nombre;
 	}
-	
 	
 }

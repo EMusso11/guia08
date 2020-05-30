@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import frsf.isi.died.guia08.problema01.exceptions.AsignarTareaEmpAsignadoException;
 import frsf.isi.died.guia08.problema01.exceptions.AsignarTareaFechaFinException;
-import frsf.isi.died.guia08.problema01.exceptions.tareaNoEncontradaException;
+import frsf.isi.died.guia08.problema01.exceptions.TareaNoEncontradaException;
 
 public class EmpleadoTest {
 
@@ -88,28 +88,29 @@ public class EmpleadoTest {
 	}
 
 	@Test
-	public void testComenzarInteger() throws tareaNoEncontradaException {
+	public void testComenzarInteger() throws TareaNoEncontradaException {
 		e3.comenzar(t7.getId());
 		assertSame(t7.getFechaInicio(), LocalDateTime.now());
 	}
 
 	@Test
-	public void testFinalizarInteger() throws tareaNoEncontradaException {
+	public void testFinalizarInteger() throws TareaNoEncontradaException {
 		e3.finalizar(t7.getId());
 		assertSame(t7.getFechaFin(), LocalDateTime.now());
 	}
 
 	@Test
-	public void testComenzarIntegerString() {
+	public void testComenzarIntegerString() throws TareaNoEncontradaException {
 		e3.comenzar(t7.getId(), "01-01-2020 12:00");
 		DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-		
-		assertSame(t7.getFechaFin(), LocalDateTime.now().parse(, format));
+		assertSame(t7.getFechaInicio(), LocalDateTime.parse("01-01-2020 12:00", format));
 	}
 
 	@Test
-	public void testFinalizarIntegerString() {
-		fail("Not yet implemented");
+	public void testFinalizarIntegerString() throws TareaNoEncontradaException {
+		e3.finalizar(t7.getId(), "01-01-2020 12:00");
+		DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+		assertSame(t7.getFechaFin(), LocalDateTime.parse("01-01-2020 12:00", format));
 	}
 
 }

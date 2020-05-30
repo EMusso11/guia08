@@ -33,6 +33,14 @@ public class AppRRHH {
 		}
 	}
 	
+	public List<Empleado> getEmpleados() {
+		return empleados;
+	}
+
+	public void setEmpleados(List<Empleado> empleados) {
+		this.empleados = empleados;
+	}
+
 	public void empezarTarea(Integer cuil,Integer idTarea) {
 		Empleado e1;
 		Tarea t1;

@@ -7,7 +7,7 @@ import org.junit.Test;
 public class AppRRHHTest {
 
 	@Test
-	public void test() {
+	public void agregarEmpleadoContratadoTest() {
 		fail("Not yet implemented");
 	}
 
