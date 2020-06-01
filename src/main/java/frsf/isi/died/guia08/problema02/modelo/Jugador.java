@@ -15,7 +15,15 @@ public class Jugador {
 	private Double peso;
 	private Pierna piernaHabil;
 	
-	List<EventoInfraccion>
-	
 	public Jugador() {}
+
+	public Posicion getPosicion() {
+		return posicion;
+	}
+
+	public void setPosicion(Posicion posicion) {
+		this.posicion = posicion;
+	}
+	
+	
 }

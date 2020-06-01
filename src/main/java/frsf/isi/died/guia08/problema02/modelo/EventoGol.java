@@ -8,4 +8,8 @@ public class EventoGol extends Evento {
 	public EventoGol() {
 		super();
 	}
+
+	public EventoGol(Equipo e1, Integer minuto) {
+		super(e1, null, minuto);
+	}
 }

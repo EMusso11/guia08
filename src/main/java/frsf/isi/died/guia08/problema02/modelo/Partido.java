@@ -1,5 +1,6 @@
 package frsf.isi.died.guia08.problema02.modelo;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,8 @@ public class Partido {
 
 	private Equipo local;
 	private Equipo visitante;
+	private LocalDateTime fecha;
+	private PlanillaPartido planilla;
 	private List<Evento> eventos;
 	
 	public Partido(Equipo local, Equipo visitante) {
