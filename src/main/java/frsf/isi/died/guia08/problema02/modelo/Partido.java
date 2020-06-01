@@ -9,8 +9,14 @@ public class Partido {
 	private Equipo visitante;
 	private List<Evento> eventos;
 	
+	public Partido(Equipo local, Equipo visitante) {
+		this.local = local;
+		this.visitante = visitante;
+	}
+
+
 	public void addEvento(Evento e) {
-		if(this.eventos ==null) this.eventos = new ArrayList<Evento>();
+		if(this.eventos == null) this.eventos = new ArrayList<Evento>();
 		this.eventos.add(e);
 	}
 	
@@ -21,19 +27,35 @@ public class Partido {
 
 
 	public Integer golesLocal() {
-		return 0;
+		return (int) this.getEventos().stream()
+					.filter(e1 -> e1 instanceof EventoGol && e1.getEquipo().getNombre() == this.getLocal().getNombre()) // que sea gol del equipo local
+					.map(e1 -> (EventoGol) e1)
+					.count();
 	}
 
 	public Integer golesVisitante() {
-		return 0;
+		return (int) this.getEventos().stream()
+				.filter(e1 -> e1 instanceof EventoGol && e1.getEquipo().getNombre() == this.getVisitante().getNombre()) // que sea gol del equipo visitante
+				.map(e1 -> (EventoGol) e1)
+				.count();
 	}
 
 	public Integer golesPuntosLocal() {
-		return 0;
+		if(this.golesLocal() > this.golesVisitante())
+			return 3;
+		else if(this.golesLocal() == this.golesVisitante())
+			return 1;
+		else
+			return 0;
 	}
 
 	public Integer golesPuntosVisitante() {
-		return 0;
+		if(this.golesLocal() < this.golesVisitante())
+			return 3;
+		else if(this.golesLocal() == this.golesVisitante())
+			return 1;
+		else
+			return 0;
 	}
 
 	public Equipo getLocal() {
