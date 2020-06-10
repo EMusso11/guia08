@@ -44,6 +44,12 @@ public class Empleado {
 		this.cuil = cuil;
 	}
 
+	public Empleado(Integer cuil, String nombre, double costoHora) {
+		this.cuil = cuil;
+		this.nombre = nombre;
+		this.costoHora = costoHora;
+	}
+
 	public String getNombre() {
 		return nombre;
 	}
@@ -72,6 +78,14 @@ public class Empleado {
 		return tareasAsignadas;
 	}
 
+	public Tipo getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(Tipo tipo) {
+		this.tipo = tipo;
+	}
+	
 	public void setTareasAsignadas(List<Tarea> tareasAsignadas) {
 		this.tareasAsignadas = tareasAsignadas;
 	}
@@ -196,5 +210,9 @@ public class Empleado {
 		} else {
 			throw new TareaNoEncontradaException("La tarea no existe en la lista.");
 		}
+	}
+	
+	public String asCsv() {
+		return this.cuil+";"+this.nombre+";"+this.costoHora;
 	}
 }

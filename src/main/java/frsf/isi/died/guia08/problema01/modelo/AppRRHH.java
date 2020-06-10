@@ -25,7 +25,7 @@ public class AppRRHH {
 		Empleado e1;
 		Tarea t1;
 		try {
-			e1 = buscarEmpleado( e -> e.getCuil().equals(cuil) ).get();
+			e1 = buscarEmpleado( e -> e.getCuil().equals(cuil) ).orElseThrow();
 			t1 = new Tarea(idTarea, descripcion, duracionEstimada);
 			e1.asignarTarea(t1);
 		} catch (NoSuchElementException e) {
@@ -43,12 +43,9 @@ public class AppRRHH {
 
 	public void empezarTarea(Integer cuil,Integer idTarea) {
 		Empleado e1;
-		Tarea t1;
 		try {
 			e1 = buscarEmpleado( e -> e.getCuil().equals(cuil) ).get();
 			e1.comenzar(idTarea);
-		} catch (NoSuchElementException e) {
-			e.getMessage();
 		} catch (TareaNoEncontradaException e) {
 			e.getMessage();
 		}
@@ -141,7 +138,7 @@ public class AppRRHH {
 		}
 	}
 	
-	private Optional<Empleado> buscarEmpleado(Predicate<Empleado> p){
+	public Optional<Empleado> buscarEmpleado(Predicate<Empleado> p){
 		return this.empleados.stream().filter(p).findFirst();
 	}
 

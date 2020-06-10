@@ -93,7 +93,7 @@ public class Tarea {
 	}
 
 	public String asCsv(Integer cuil, String nombre) {
-		return this.id+";\""+this.descripcion+";\""+cuil+";\""+nombre;
+		return this.id+";"+this.descripcion+";"+cuil+";"+nombre;
 	}
 	
 }
